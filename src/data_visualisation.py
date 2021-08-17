@@ -14,7 +14,7 @@ def demand_over_time(data, title, x_label):
     return memfile
 
 
-def sidebyside_stacked_barcharts(data, l_stack_vars, r_stack_vars, title, y_label):
+def paired_stacked_bars(data, l_stack_vars, r_stack_vars, title, y_label):
     l_stack_vals, r_stack_vals = [list(data[var]) for var in l_stack_vars], [list(data[var]) for var in r_stack_vars]
     fix, ax = plt.subplots()
     index, width, space = np.arange(len(data)) - 0.17, 0.30, 0.05

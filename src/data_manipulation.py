@@ -6,7 +6,6 @@ import pandas as pd
 
 
 def aggregate_gridded_weather_data():
-    # Aggregate gridded weather data
     temp_sets = g.csv_multi_read('data/temperatures_historic', [2, 3])
     wind_sets = g.csv_multi_read('data/wind_speeds_historic', [2, 3])
     # The loop groups and means the grid points for each location, then the outer groupby groups and means the locations
@@ -18,7 +17,6 @@ def aggregate_gridded_weather_data():
 
 
 def dsa_data_quality():
-    # Load and improve quality of DSA Dataset
     energy_data = pd.read_csv('data/DSA_Dataset.csv')
     # Ensure complete timeseries column
     energy_data = t.replace_missing_datetimes(energy_data, 'Timestamp', '%m/%d/%Y %H:%M', '5min')
