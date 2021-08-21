@@ -1,33 +1,53 @@
+from sklearn import linear_model as lm
 from numpy import loadtxt
+import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense
 import pandas as pd
-from sklearn import linear_model as lm
+import numpy as np
+from services import matrix
 
 
-def multireg(path, X_set, y, train_threshold):
-    df = pd.read_csv(path, parse_dates=True)
-    train_X, test_X = df[X_set][:train_threshold], df[X_set][train_threshold:]
-    train_y, test_y = df[y][:train_threshold], df[y][train_threshold:]
-    regr = lm.LinearRegression()
-    regr.fit(train_X, train_y)
-    test_forecast = []
-    for index, row in test_X.iterrows():
-        test = regr.predict([[row[variable] for variable in X_set]])
-        test_forecast.append(test[0])
-    sum_test_forecast = sum(v for i, v in enumerate(test_forecast))
-    return sum_test_forecast
+def multireg(path, X_set, y, tr_threshold):
+    data = pd.read_csv(path, parse_dates=True)
+    X_tr, y_tr, X_te = data[X_set][:tr_threshold], data[y][:tr_threshold], data[X_set][tr_threshold:]
+    model = lm.LinearRegression()
+    model.fit(X_tr, y_tr)
+    return sum(model.predict(X_te))
 
 
-def ann(path, all_vars, ind_vars, dep_var, train_threshold):
+def ann(path, all_vars, X_set, y, tr_threshold):
     data = loadtxt(path, delimiter=',', skiprows=1, usecols=all_vars)
-    X, y = data[:, ind_vars], data[:, dep_var]
+    X_tr, y_tr, X_te = data[:tr_threshold, X_set], data[:tr_threshold, y], data[tr_threshold:, X_set]
     model = Sequential()
-    model.add(Dense(12, input_dim=3, kernel_initializer='normal', activation='relu'))
-    model.add(Dense(6, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(3, input_dim=4, kernel_initializer='normal', activation='relu'))
     model.add(Dense(1, kernel_initializer='normal'))
     model.compile(loss='mean_squared_error', optimizer='adam')
-    model.fit(X, y, epochs=150, batch_size=3)
-    pred_train = model.predict(X)
-    sum_test_forecast = sum(pred_train[train_threshold:])[0]
-    return sum_test_forecast
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+    model.fit(X_tr, y_tr, epochs=110, batch_size=4, callbacks=[callback])
+    return model.predict(X_te)
+
+
+# def mf_multireg(path, X_set, y, train_threshold):
+#     df = pd.read_csv(path, parse_dates=True)
+#     train_X, test_X = df[X_set][:train_threshold], df[X_set][train_threshold:]
+#     train_y, test_y = df[y][:train_threshold], df[y][train_threshold:]
+#     null_y_matrix = matrix.get_null_y_matrix(train_X, y)
+#     transposed_matrix = matrix.transpose(null_y_matrix)
+#     product_matrix = matrix.multiply(transposed_matrix, null_y_matrix)
+#     inverse_matrix = pd.DataFrame(_ for _ in np.linalg.inv(product_matrix.values.tolist()))
+#     b_hat = matrix.multiply(transposed_matrix, train_y)
+#     b_hat_vals = matrix.multiply(inverse_matrix, b_hat)
+#     X_b_hat = matrix.multiply(null_y_matrix, b_hat_vals)
+#     e_vals = matrix.add_subtract(train_y, X_b_hat, 'sub')
+#     sum_e_sq = matrix.sum_e_sq(e_vals)
+#     Ssq_b = (sum_e_sq / (len(train_X) - len(train_X.columns))) * inverse_matrix
+#     Ssq_vals = matrix.diaval(Ssq_b)
+#     test_list = test_X.values.tolist()
+#     output = 0
+#     for row in test_list:
+#         print(row)
+    #     output += Ssq_vals[0]
+    #     for value in range(1, len(Ssq_vals)):
+    #         output += row[value] * Ssq_vals[value]
+    # print(output)

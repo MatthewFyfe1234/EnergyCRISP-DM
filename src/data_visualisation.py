@@ -3,12 +3,15 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 
 
-def demand_over_time(data, title, x_label):
-    data['Demand'].plot(marker='.', color='black', alpha=0.5, figsize=(14, 5))
-    plt.title(title)
-    plt.ylabel('Demand (MW)')
-    plt.xlabel(x_label)
-    plt.ticklabel_format(style='sci', axis='y', scilimits=(1, 1))
+def generate_plot_with_secondary_y(data, title, x_label):
+    fig, ax1 = plt.subplots(figsize=(25, 25))
+    fig.suptitle(title, ha='center')
+    ax2 = ax1.twinx()
+    ax1.set_xlabel(x_label)
+    ax1.plot(data['Demand'], marker='.', color='black', alpha=0.9)
+    ax2.plot(data['t_mean_2m_1h:C'], marker=None, color='blue', alpha=0.3)
+    ax1.set_ylabel('Energy(MW)')
+    ax2.set_ylabel('Temp(C)', color='blue')
     memfile = BytesIO()
     plt.savefig(memfile)
     return memfile
