@@ -36,12 +36,12 @@ document.add_heading('Data Visualisations', 0)
 # Show how the variables in the base dataset relate to each other
 title = 'Weekly Demand Totals Compared With\nStacked Import and Generation'
 demand_comp = dv.paired_stacked_bars(weekly_data, ['Demand'], ['Import', 'Generation'], title, 'Energy(MW)')
-document.add_picture(demand_comp, width=Cm(17), height=Cm(11))
+document.add_picture(demand_comp, width=Cm(17), height=Cm(10))
 title = 'Weekly Generation Totals Compared With\nStacked Solar, Wind and Other Generation'
 generat_comp = dv.paired_stacked_bars(weekly_data, ['Generation'], ['Other', 'Wind', 'Solar'], title, 'Generation(MW)')
-document.add_picture(generat_comp, width=Cm(17), height=Cm(11))
+document.add_picture(generat_comp, width=Cm(17), height=Cm(10))
 
-# Show energy totals and average temperature, for each day in the dataset
+# Show energy total and average temperature, for each day in the dataset
 daily_demand = dv.generate_plot_with_secondary_y(daily_data, 'Daily Demand Totals', 'Day Number')
 document.add_picture(daily_demand, width=Cm(17), height=Cm(7.5))
 
