@@ -2,6 +2,7 @@ from sklearn import linear_model as lm
 from numpy import loadtxt
 import tensorflow as tf
 from keras.models import Sequential
+from keras.layers import Dropout
 from keras.layers import Dense
 import pandas as pd
 import numpy as np
@@ -21,6 +22,7 @@ def ann(path, all_vars, X_set, y, tr_threshold):
     X_tr, y_tr, X_te = data[:tr_threshold, X_set], data[:tr_threshold, y], data[tr_threshold:, X_set]
     model = Sequential()
     model.add(Dense(3, input_dim=4, kernel_initializer='normal', activation='relu'))
+    # model.add(Dropout(0.5, input_shape=(3,)))
     model.add(Dense(1, kernel_initializer='normal'))
     model.compile(loss='mean_squared_error', optimizer='adam')
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
